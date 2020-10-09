@@ -17,6 +17,12 @@
             opacity: 0.75;
             color: black;
         }
+
+        /* 设置树形最外层的背景颜色和字体颜色 */
+        .el-tree {
+            color: black;
+            background: transparent;
+        }
     </style>
     <title>学术家族树</title>
 </head>
@@ -58,8 +64,11 @@
                             </el-button>
                             <el-button type="text" size="mini" icon="el-icon-plus" @click="() => append(node, data)">
                             </el-button>
-                            <el-button type="text" size="mini" icon="el-icon-minus" @click="() => remove(node, data)">
-                            </el-button>
+                            <el-tooltip class="item" effect="dark" content="删除节点信息" placement="top">
+                                <el-button type="text" size="mini" icon="el-icon-minus"
+                                    @click="() => remove(node, data)">
+                                </el-button>
+                            </el-tooltip>
                         </span>
                     </span>
                 </el-tree>
@@ -208,6 +217,10 @@
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                 }).then(({ value }) => {
+                    if (this.info[data.label]) {
+                        this.info[value] = this.info[data.label];
+                        this.info[data.label] = null;
+                    }
                     data.label = value;
                 });
             }
