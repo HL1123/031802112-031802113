@@ -10,13 +10,16 @@
             background-image: url(background.jpeg);
             /* background-repeat: no-repeat; */
             background-attachment: fixed;
-            /* background-size:cover; */
-
+            background-size: cover;
         }
 
         #app {
-            opacity: 0.5;
+            opacity: 0.75;
             color: black;
+        }
+
+        .trans {
+            background: rgba(255, 255, 255, 0.5);
         }
     </style>
     <title>学术家族树</title>
@@ -39,17 +42,28 @@
                 </el-input>
                 <br><br>
                 <el-row type="flex" justify="center">
-                    <el-button type="primary" @click="processInput">添加家族树</el-button>
+                    <el-button type="primary" @click="processInput">生成家族树</el-button>
                     <el-button @click="clearData">清空</el-button>
                 </el-row>
                 <div class="grid-content"></div>
             </el-col>
             <el-col :span="16">
-                <el-input placeholder="输入关键字搜索" v-model="filterText">
+                <el-input placeholder="输入关键字搜索" v-model="filterText" clearable>
                 </el-input>
                 <el-tree class="filter-tree" :data="data" :props="defaultProps" node-key="id" default-expand-all
-                    :filter-node-method="filterNode" @node-click="retrieveInfo" draggable :allow-drop="allowDrop"
-                    :allow-drag="allowDrag" ref="tree">
+                    :filter-node-method="filterNode" @node-click="retrieveInfo" draggable :expand-on-click-node="false"
+                    ref="tree">
+                    <span class="custom-tree-node" slot-scope="{ node, data }">
+                        <span>{{ node.label }}</span>
+                        <span>
+                            <el-button type="text" size="mini" icon="el-icon-edit-outline" @click="() => modify(data)">
+                            </el-button>
+                            <el-button type="text" size="mini" icon="el-icon-plus" @click="() => append(data)">
+                            </el-button>
+                            <el-button type="text" size="mini" icon="el-icon-minus" @click="() => remove(node, data)">
+                            </el-button>
+                        </span>
+                    </span>
                 </el-tree>
                 <div class="grid-content"></div>
             </el-col>
@@ -63,7 +77,6 @@
 <!-- import JavaScript -->
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 <script>
-    let id = 1000;
     var Main = {
         watch: {
             filterText(val) {
@@ -78,6 +91,8 @@
             },
 
             processInput() {
+                this.data = [];
+                this.treeCount = -1;
                 lines = this.inputData.split("\n"); // 拆分输入行
                 type = 0;
                 flag = false;
@@ -88,25 +103,30 @@
                     if (parts[0] === "导师") { // 建立新树
                         flag = true;
                         type = 0; // 重置学生类型
-                        newChild = { label: parts[1], children: [] };
+                        newChild = {
+                            label: parts[1],
+                            children: []
+                        };
                         this.data.push(newChild); // 插入导师根节点
                         this.treeCount++;
-                    }
-                    else if (parts[0].search(/博士生|硕士生|本科生/) != -1) { // 该行为学生
-                        newChild = { label: parts[0], children: [] };
+                    } else if (parts[0].search(/博士生|硕士生|本科生/) != -1) { // 该行为学生
+                        newChild = {
+                            label: parts[0],
+                            children: []
+                        };
                         this.data[this.treeCount].children.push(newChild); // 添加学生类型结点
                         people = parts[1].split("、"); // 分隔学生姓名
                         // console.log(people);
                         for (person in people) {
-                            newLeaf = { label: people[person] };
+                            newLeaf = {
+                                label: people[person]
+                            };
                             this.data[this.treeCount].children[type].children.push(newLeaf); // 添加学生叶节点
                         }
                         type++;
-                    }
-                    else if (parts.length == 2) {
+                    } else if (parts.length == 2) {
                         this.info[parts[0]] = parts[1];
-                    }
-                    else if (parts[0] != "") {
+                    } else if (parts[0] != "") {
                         temp = parseInt(line) + 1;
                         this.$alert("请检查输入格式是否正确并尝试重新输入。第 " + temp + " 行可能有错。", '输入错误');
                         flag = true;
@@ -119,8 +139,7 @@
             },
 
             clearData() {
-                this.data = [];
-                this.treeCount = -1;
+                this.inputData = '';
             },
 
             retrieveInfo(leaf) {
@@ -128,21 +147,54 @@
                     this.$alert(leaf.label + "：" + this.info[leaf.label]);
                 }
             },
+
+            append(data) {
+                this.$prompt('请输入姓名', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(({ value }) => {
+                    newChild = {
+                        label: value,
+                        children: []
+                    };
+                    if (!data.children) {
+                        this.$set(data, 'children', []);
+                    }
+                    data.children.push(newChild);
+                });
+            },
+
+            remove(node, data) {
+                parent = node.parent;
+                console.log(parent);
+                children = parent.data.children || parent.data;
+                index = children.findIndex(d => d.label === data.label);
+                children.splice(index, 1);
+            },
+
+            modify(data) {
+                this.$prompt('请输入姓名', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(({ value }) => {
+                    data.label = value;
+                });
+            }
         },
 
         data() {
             return {
-                treeCount: -1,
+                treeCount: -1, // 记录根节点个数
                 inputData: '',
                 filterText: '',
-                data: [],
+                data: [], // 存放树结点
                 info: {},
                 defaultProps: {
                     children: 'children',
                     label: 'label'
                 }
             };
-        }
+        },
     };
     var Ctor = Vue.extend(Main)
     new Ctor().$mount('#app')
