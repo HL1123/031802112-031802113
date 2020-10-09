@@ -31,7 +31,11 @@
                 <el-input placeholder="输入关键字搜索" v-model="filterText">
                 </el-input>
                 <el-tree class="filter-tree" :data="data" :props="defaultProps" node-key="id" default-expand-all
+<<<<<<< HEAD
                     :filter-node-method="filterNode" @node-click="retrieveInfo" draggable :allow-drop="allowDrop"
+=======
+                    :filter-node-method="filterNode" draggable :allow-drop="allowDrop"
+>>>>>>> 9ae964739fb225d9744ebd597ae840b0d3dee047
                     :allow-drag="allowDrag" ref="tree">
                 </el-tree>
                 <div class="grid-content"></div>
@@ -84,6 +88,7 @@
                         }
                         type++;
                     }
+<<<<<<< HEAD
                     else if (parts.length == 2) {
                         this.info[parts[0]] = parts[1];
                     }
@@ -102,6 +107,11 @@
             retrieveInfo(leaf) {
                 if (this.info[leaf.label] != null) {
                     this.$alert(leaf.label + "：" + this.info[leaf.label]);
+=======
+                    // else {
+
+                    // }
+>>>>>>> 9ae964739fb225d9744ebd597ae840b0d3dee047
                 }
             },
         },
@@ -112,7 +122,10 @@
                 inputData: '',
                 filterText: '',
                 data: [],
+<<<<<<< HEAD
                 info: {},
+=======
+>>>>>>> 9ae964739fb225d9744ebd597ae840b0d3dee047
                 defaultProps: {
                     children: 'children',
                     label: 'label'
