@@ -17,10 +17,6 @@
             opacity: 0.75;
             color: black;
         }
-
-        .trans {
-            background: rgba(255, 255, 255, 0.5);
-        }
     </style>
     <title>学术家族树</title>
 </head>
@@ -50,7 +46,7 @@
             <el-col :span="16">
                 <el-input placeholder="输入关键字搜索" v-model="filterText" clearable>
                 </el-input>
-                <el-tree class="filter-tree" :data="data" :props="defaultProps" node-key="id" default-expand-all
+                <el-tree class="filter-tree" :data="data" :props="defaultProps" node-key="label" default-expand-all
                     :filter-node-method="filterNode" @node-click="retrieveInfo" draggable :expand-on-click-node="false"
                     ref="tree">
                     <span class="custom-tree-node" slot-scope="{ node, data }">
@@ -58,7 +54,7 @@
                         <span>
                             <el-button type="text" size="mini" icon="el-icon-edit-outline" @click="() => modify(data)">
                             </el-button>
-                            <el-button type="text" size="mini" icon="el-icon-plus" @click="() => append(data)">
+                            <el-button type="text" size="mini" icon="el-icon-plus" @click="() => append(node, data)">
                             </el-button>
                             <el-button type="text" size="mini" icon="el-icon-minus" @click="() => remove(node, data)">
                             </el-button>
@@ -105,21 +101,25 @@
                         type = 0; // 重置学生类型
                         newChild = {
                             label: parts[1],
-                            children: []
+                            children: [],
+                            isLeaf: false
                         };
                         this.data.push(newChild); // 插入导师根节点
                         this.treeCount++;
                     } else if (parts[0].search(/博士生|硕士生|本科生/) != -1) { // 该行为学生
                         newChild = {
                             label: parts[0],
-                            children: []
+                            children: [],
+                            isLeaf: false
                         };
                         this.data[this.treeCount].children.push(newChild); // 添加学生类型结点
                         people = parts[1].split("、"); // 分隔学生姓名
                         // console.log(people);
                         for (person in people) {
                             newLeaf = {
-                                label: people[person]
+                                label: people[person],
+                                children: [],
+                                isLeaf: true
                             };
                             this.data[this.treeCount].children[type].children.push(newLeaf); // 添加学生叶节点
                         }
@@ -148,35 +148,51 @@
                 }
             },
 
-            append(data) {
-                this.$prompt('请输入姓名', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                }).then(({ value }) => {
-                    newChild = {
-                        label: value,
-                        children: []
-                    };
-                    if (!data.children) {
-                        this.$set(data, 'children', []);
-                    }
-                    data.children.push(newChild);
-                });
+            append(node, data) {
+                if (!data.isLeaf) {
+                    this.$prompt('请输入添加内容', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                    }).then(({ value }) => {
+                        if (!node.parent.label) {
+                            newChild = {
+                                label: value,
+                                children: [],
+                                isLeaf: false
+                            };
+                        }
+                        else {
+                            newChild = {
+                                label: value,
+                                children: [],
+                                isLeaf: true
+                            };
+                        }
+                        data.children.push(newChild);
+                    });
+                }
+                else {
+                    this.$alert('不允许向学生添加子节点。', '错误');
+                }
             },
 
             remove(node, data) {
                 parent = node.parent;
-                console.log(parent);
+                // console.log(parent);
                 children = parent.data.children || parent.data;
                 index = children.findIndex(d => d.label === data.label);
                 children.splice(index, 1);
             },
 
             modify(data) {
-                this.$prompt('请输入姓名', '提示', {
+                this.$prompt('请输入修改内容', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                 }).then(({ value }) => {
+                    if (this.info[data.label]) {
+                        this.info[value] = this.info[data.label];
+                        this.info[data.label] = null;
+                    }
                     data.label = value;
                 });
             }
