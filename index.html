@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <title>学术家族树</title>
+</head>
+
+<body>
+    <h1 style="text-align: center;">学术家族树</h1>
+    <div id="app">
+        <el-row :gutter="10">
+            <el-col :span="8">
+                <el-input type="textarea" :rows="25" placeholder="导师：张三
+2016级博士生：天一、王二、吴五
+2015级硕士生：李四、王五、许六
+2016级硕士生：刘一、李二、李三
+2017级本科生：刘六、琪七、司四
+        
+刘六：JAVA、数学建模
+        
+李二：字节跳动、京东云" v-model="inputData">
+                </el-input>
+                <br><br>
+                <el-button type="primary" @click="processInput" style="display:block;margin:0 auto">添加家族树</el-button>
+                <div class="grid-content"></div>
+            </el-col>
+            <el-col :span="16">
+                <el-input placeholder="输入关键字搜索" v-model="filterText">
+                </el-input>
+                <el-tree class="filter-tree" :data="data" :props="defaultProps" node-key="id" default-expand-all
+                    :filter-node-method="filterNode" @node-click="retrieveInfo" draggable :allow-drop="allowDrop"
+                    :allow-drag="allowDrag" ref="tree">
+                </el-tree>
+                <div class="grid-content"></div>
+            </el-col>
+        </el-row>
+    </div>
+</body>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    let id = 1000;
+    var Main = {
+        watch: {
+            filterText(val) {
+                this.$refs.tree.filter(val);
+            }
+        },
+
+        methods: {
+            filterNode(value, data) {
+                if (!value) return true;
+                return data.label.indexOf(value) !== -1;
+            },
+
+            processInput() {
+                lines = this.inputData.split("\n"); // 拆分输入行
+                type = 0;
+                flag = false;
+                // console.log(lines);
+                for (line in lines) {
+                    parts = lines[line].split("："); // 0 为数据类型，1 为数据内容
+                    // console.log(parts);
+                    if (parts[0] === "导师") { // 建立新树
+                        flag = true;
+                        type = 0; // 重置学生类型
+                        newChild = { label: parts[1], children: [] };
+                        this.data.push(newChild); // 插入导师根节点
+                        this.treeCount++;
+                    }
+                    else if (parts[0].search(/博士生|硕士生|本科生/) != -1) { // 该行为学生
+                        newChild = { label: parts[0], children: [] };
+                        this.data[this.treeCount].children.push(newChild); // 添加学生类型结点
+                        people = parts[1].split("、"); // 分隔学生姓名
+                        // console.log(people);
+                        for (person in people) {
+                            newLeaf = { label: people[person] };
+                            this.data[this.treeCount].children[type].children.push(newLeaf); // 添加学生叶节点
+                        }
+                        type++;
+                    }
+                    else if (parts.length == 2) {
+                        this.info[parts[0]] = parts[1];
+                    }
+                    else if (parts[0] != "") {
+                        temp = parseInt(line) + 1;
+                        this.$alert("请检查输入格式是否正确并尝试重新输入。错误可能发生在第 " + temp + " 行。", '输入错误');
+                        flag = true;
+                        break;
+                    }
+                }
+                if (!flag) {
+                    this.$alert("请检查输入格式是否正确并尝试重新输入。", '输入错误');
+                }
+            },
+
+            retrieveInfo(leaf) {
+                if (this.info[leaf.label] != null) {
+                    this.$alert(leaf.label + "：" + this.info[leaf.label]);
+                }
+            },
+        },
+
+        data() {
+            return {
+                treeCount: -1,
+                inputData: '',
+                filterText: '',
+                data: [],
+                info: {},
+                defaultProps: {
+                    children: 'children',
+                    label: 'label'
+                }
+            };
+        }
+    };
+    var Ctor = Vue.extend(Main)
+    new Ctor().$mount('#app')
+</script>
+
+</html>
