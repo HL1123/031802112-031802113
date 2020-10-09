@@ -201,6 +201,10 @@
                             break;
                         }
                     }
+                    else
+                    {
+                        break;
+                    }
                 }
                 if (!flag) {
                     this.$alert("请检查输入格式是否正确并尝试重新输入。", '输入错误');
@@ -260,10 +264,6 @@
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                 }).then(({ value }) => {
-                    if (this.info[data.label]) {
-                        this.info[value] = this.info[data.label];
-                        this.info[data.label] = null;
-                    }
                     data.label = value;
                 });
             }
