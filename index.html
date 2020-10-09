@@ -17,6 +17,12 @@
             opacity: 0.75;
             color: black;
         }
+
+        /* 设置树形最外层的背景颜色和字体颜色 */
+        .el-tree {
+            color: black;
+            background: transparent;
+        }
     </style>
     <title>学术家族树</title>
 </head>
@@ -26,7 +32,9 @@
     <div id="app">
         <el-row :gutter="10">
             <el-col :span="8">
-                <el-input type="textarea" :rows="25" placeholder="导师：张三
+                <el-input type="textarea" :rows="25" placeholder="输入示例：
+
+导师：张三
 2016级博士生：天一、王二、吴五
 2015级硕士生：李四、王五、许六
 2016级硕士生：刘一、李二、李三
@@ -44,11 +52,11 @@
                 <div class="grid-content"></div>
             </el-col>
             <el-col :span="16">
-                <el-input placeholder="输入关键字搜索" v-model="filterText" clearable>
+                <el-input placeholder="输入关键字搜索" id="search" v-model="filterText" clearable>
                 </el-input>
-                <el-tree class="filter-tree" :data="data" :props="defaultProps" node-key="label" default-expand-all
-                    :filter-node-method="filterNode" @node-click="retrieveInfo" draggable :expand-on-click-node="false"
-                    ref="tree">
+                <el-tree class="filter-tree" id="tree" :data="data" :props="defaultProps" node-key="label"
+                    default-expand-all :filter-node-method="filterNode" @node-click="retrieveInfo" draggable
+                    :expand-on-click-node="false" hidden>
                     <span class="custom-tree-node" slot-scope="{ node, data }">
                         <span>{{ node.label }}</span>
                         <span>
@@ -56,8 +64,11 @@
                             </el-button>
                             <el-button type="text" size="mini" icon="el-icon-plus" @click="() => append(node, data)">
                             </el-button>
-                            <el-button type="text" size="mini" icon="el-icon-minus" @click="() => remove(node, data)">
-                            </el-button>
+                            <el-tooltip class="item" effect="dark" content="删除节点信息" placement="top">
+                                <el-button type="text" size="mini" icon="el-icon-minus"
+                                    @click="() => remove(node, data)">
+                                </el-button>
+                            </el-tooltip>
                         </span>
                     </span>
                 </el-tree>
@@ -87,6 +98,7 @@
             },
 
             processInput() {
+                document.getElementById('tree').removeAttribute("hidden");
                 this.data = [];
                 this.treeCount = -1;
                 lines = this.inputData.split("\n"); // 拆分输入行
@@ -102,35 +114,49 @@
                         newChild = {
                             label: parts[1],
                             children: [],
-                            isLeaf: false
+                            isLeaf: false,
+                            info: null
                         };
                         this.data.push(newChild); // 插入导师根节点
                         this.treeCount++;
-                    } else if (parts[0].search(/博士生|硕士生|本科生/) != -1) { // 该行为学生
-                        newChild = {
-                            label: parts[0],
-                            children: [],
-                            isLeaf: false
-                        };
-                        this.data[this.treeCount].children.push(newChild); // 添加学生类型结点
-                        people = parts[1].split("、"); // 分隔学生姓名
-                        // console.log(people);
-                        for (person in people) {
-                            newLeaf = {
-                                label: people[person],
+                    } else if (this.treeCount >= 0) {
+                        if (parts[0].search(/博士生|硕士生|本科生/) != -1) { // 该行为学生
+                            newChild = {
+                                label: parts[0],
                                 children: [],
-                                isLeaf: true
+                                isLeaf: false,
+                                info: null
                             };
-                            this.data[this.treeCount].children[type].children.push(newLeaf); // 添加学生叶节点
+                            this.data[this.treeCount].children.push(newChild); // 添加学生类型结点
+                            people = parts[1].split("、"); // 分隔学生姓名
+                            // console.log(people);
+                            for (person in people) {
+                                newLeaf = {
+                                    label: people[person],
+                                    children: [],
+                                    isLeaf: true,
+                                    info: null
+                                };
+                                this.data[this.treeCount].children[type].children.push(newLeaf); // 添加学生叶节点
+                            }
+                            type++;
+                        } else if (parts.length === 2) {
+                            if (this.data[this.treeCount].label === parts[0]) {
+                                this.data[this.treeCount].info = parts[1];
+                            }
+                            for (itype = 0; itype < type; itype++) {
+                                for (person in this.data[this.treeCount].children[itype].children) {
+                                    if (this.data[this.treeCount].children[itype].children[person].label === parts[0]) {
+                                        this.data[this.treeCount].children[itype].children[person].info = parts[1];
+                                    }
+                                }
+                            }
+                        } else if (parts[0] != "") {
+                            temp = parseInt(line) + 1;
+                            this.$alert("请检查输入格式是否正确并尝试重新输入。第 " + temp + " 行可能有错。", '输入错误');
+                            flag = true;
+                            break;
                         }
-                        type++;
-                    } else if (parts.length == 2) {
-                        this.info[parts[0]] = parts[1];
-                    } else if (parts[0] != "") {
-                        temp = parseInt(line) + 1;
-                        this.$alert("请检查输入格式是否正确并尝试重新输入。第 " + temp + " 行可能有错。", '输入错误');
-                        flag = true;
-                        break;
                     }
                 }
                 if (!flag) {
@@ -143,8 +169,8 @@
             },
 
             retrieveInfo(leaf) {
-                if (this.info[leaf.label] != null) {
-                    this.$alert(leaf.label + "：" + this.info[leaf.label]);
+                if (leaf.info) {
+                    this.$alert(leaf.label + "：" + leaf.info);
                 }
             },
 
@@ -158,14 +184,16 @@
                             newChild = {
                                 label: value,
                                 children: [],
-                                isLeaf: false
+                                isLeaf: false,
+                                info: null
                             };
                         }
                         else {
                             newChild = {
                                 label: value,
                                 children: [],
-                                isLeaf: true
+                                isLeaf: true,
+                                info: null
                             };
                         }
                         data.children.push(newChild);
@@ -204,7 +232,6 @@
                 inputData: '',
                 filterText: '',
                 data: [], // 存放树结点
-                info: {},
                 defaultProps: {
                     children: 'children',
                     label: 'label'
