@@ -20,10 +20,10 @@
 2015级硕士生：李四、王五、许六
 2016级硕士生：刘一、李二、李三
 2017级本科生：刘六、琪七、司四
-        
+
 刘六：JAVA、数学建模
-        
-李二：字节跳动、京东云" v-model="inputData">
+
+李二：字节跳动、京东云" v-model="inputData" autofocus resize="none">
                 </el-input>
                 <br><br>
                 <el-row id="button" type="flex" justify="center">
@@ -35,7 +35,7 @@
             <el-col :span="16">
                 <el-input placeholder="输入关键字搜索" id="search" v-model="filterText" clearable>
                 </el-input>
-                <el-tree class="filter-tree" id="tree" :data="data" :props="defaultProps" node-key="label"
+                <el-tree class="filter-tree" id="tree" :data="data" :props="defaultProps" node-key="id"
                     default-expand-all :filter-node-method="filterNode" draggable :expand-on-click-node="false" hidden
                     ref="tree">
                     <span class="custom-tree-node" slot-scope="{ node, data }">

@@ -15,6 +15,7 @@ var Main = {
             document.getElementById('tree').removeAttribute("hidden");
             this.data = [];
             this.treeCount = -1;
+            id = 0;
             type = 0;
             if (this.inputData) {
                 lines = this.inputData.split("\n"); // 拆分输入行
@@ -27,6 +28,7 @@ var Main = {
                         flag = true;
                         type = 0; // 重置学生类型
                         newChild = {
+                            id: id++,
                             label: parts[1],
                             children: [],
                             level: 0,
@@ -37,6 +39,7 @@ var Main = {
                     } else if (this.treeCount >= 0) {
                         if (parts[0].search(/博士生|硕士生|本科生/) != -1) { // 该行为学生
                             newChild = {
+                                id: id++,
                                 label: parts[0],
                                 children: [],
                                 level: 1,
@@ -47,6 +50,7 @@ var Main = {
                             // console.log(people);
                             for (person in people) {
                                 newLeaf = {
+                                    id: id++,
                                     label: people[person],
                                     children: [],
                                     level: 2,
@@ -96,8 +100,10 @@ var Main = {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
             }).then(({ value }) => {
-                if (node.level == 1) {
+                console.log(node.level);
+                if (node.level == 2) {
                     newChild = {
+                        id: id++,
                         label: value,
                         children: [],
                         level: 2,
@@ -106,6 +112,7 @@ var Main = {
                 }
                 else {
                     newChild = {
+                        id: id++,
                         label: value,
                         children: [],
                         level: 1,
@@ -118,9 +125,8 @@ var Main = {
 
         remove(node, data) {
             parent = node.parent;
-            // console.log(parent);
             children = parent.data.children || parent.data;
-            index = children.findIndex(d => d.label === data.label);
+            index = children.findIndex(d => d.id === data.id);
             children.splice(index, 1);
         },
 
