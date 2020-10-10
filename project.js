@@ -96,31 +96,16 @@ var Main = {
         },
 
         append(node, data) {
-            this.$prompt('请输入添加内容', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-            }).then(({ value }) => {
-                console.log(node.level);
-                if (node.level == 2) {
-                    newChild = {
-                        id: id++,
-                        label: value,
-                        children: [],
-                        level: 2,
-                        info: null
-                    };
-                }
-                else {
-                    newChild = {
-                        id: id++,
-                        label: value,
-                        children: [],
-                        level: 1,
-                        info: null
-                    };
-                }
-                data.children.push(newChild);
-            });
+            this.temp = data;
+            this.actionType = 0;
+            this.form.name = "";
+            this.form.info = "";
+            if (data.level == 1) {
+                this.dialog1Visible = true;
+            }
+            else {
+                this.dialog2Visible = true;
+            }
         },
 
         remove(node, data) {
@@ -131,12 +116,49 @@ var Main = {
         },
 
         modify(data) {
-            this.$prompt('请输入修改内容', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-            }).then(({ value }) => {
-                data.label = value;
-            });
+            this.temp = data;
+            this.actionType = 1;
+            this.form.name = data.label;
+            this.form.info = data.info;
+            if (data.level != 1) {
+                this.dialog1Visible = true;
+            }
+            else {
+                this.dialog2Visible = true;
+            }
+        },
+
+        handleClose1() {
+            this.dialog1Visible = false;
+            if (this.actionType) {
+                this.temp.label = this.form.name;
+                this.temp.info = this.form.info;
+            } else {
+                newChild = {
+                    id: id++,
+                    label: this.form.name,
+                    children: [],
+                    level: 2,
+                    info: this.form.info
+                };
+                this.temp.children.push(newChild);
+            }
+        },
+
+        handleClose2() {
+            this.dialog2Visible = false;
+            if (this.actionType) {
+                this.temp.label = this.form.name;
+            } else {
+                newChild = {
+                    id: id++,
+                    label: this.form.name,
+                    children: [],
+                    level: 1,
+                    info: null
+                };
+                this.temp.children.push(newChild);
+            }
         }
     },
 
@@ -146,6 +168,14 @@ var Main = {
             inputData: '',
             filterText: '',
             data: [], // 存放树结点
+            dialog1Visible: false,
+            dialog2Visible: false,
+            actionType: 0,
+            temp: null,
+            form: {
+                name: '',
+                info: ''
+            },
             defaultProps: {
                 children: 'children',
                 label: 'label'

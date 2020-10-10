@@ -12,6 +12,31 @@
 <body>
     <h1 style="text-align: center;">学术家族树</h1>
     <div id="app">
+        <el-dialog title="请输入信息" :visible.sync="dialog1Visible" :modal-append-to-body='false'>
+            <el-form :model="form">
+                <el-form-item label="姓名">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="技能或工作经历">
+                    <el-input v-model="form.info"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialog1Visible = false">取消</el-button>
+                <el-button type="primary" @click="handleClose1()">确定</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog title="请输入信息" :visible.sync="dialog2Visible" :modal-append-to-body='false'>
+            <el-form :model="form">
+                <el-form-item label="学生类型">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialog2Visible = false">取消</el-button>
+                <el-button type="primary" @click="handleClose2()">确定</el-button>
+            </span>
+        </el-dialog>
         <el-row :gutter="10">
             <el-col :span="8">
                 <el-input id="input" type="textarea" placeholder="输入示例：
