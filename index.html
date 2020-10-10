@@ -92,24 +92,30 @@
                 <el-input placeholder="输入关键字搜索" id="search" v-model="filterText" clearable>
                 </el-input>
                 <el-tree class="filter-tree" id="tree" :data="data" :props="defaultProps" node-key="label"
-                    default-expand-all :filter-node-method="filterNode" @node-click="retrieveInfo" draggable
-                    :expand-on-click-node="false" hidden ref="tree">
+                    default-expand-all :filter-node-method="filterNode" draggable :expand-on-click-node="false" hidden
+                    ref="tree">
                     <span class="custom-tree-node" slot-scope="{ node, data }">
-                        <span>{{ node.label }}</span>
                         <span>
-                            <el-tooltip class="item" effect="dark" content="修改" placement="top">
-                                <el-button type="text" size="mini" icon="el-icon-edit-outline"
-                                    @click="() => modify(data)">
+                            <el-tooltip v-if="data.info" class="item" effect="dark" content="查看资料" placement="top">
+                                <el-button type="text" icon="el-icon-user" @click="() => retrieveInfo(data)">
                                 </el-button>
                             </el-tooltip>
-                            <el-tooltip class="item" effect="dark" content="添加" placement="top">
-                                <el-button type="text" size="mini" icon="el-icon-plus"
-                                    @click="() => append(node, data)">
+                            <el-button v-else-if="data.level != 1" type="text" style="color: gray;" icon="el-icon-user">
+                            </el-button>
+                        </span>
+                        <span v-if="!data.level" style="font-weight: 700">{{ node.label }}</span>
+                        <span v-else>{{ node.label }}</span>
+                        <span>
+                            <el-tooltip class="item" effect="dark" content="修改" placement="top">
+                                <el-button type="text" icon="el-icon-edit-outline" @click="() => modify(data)">
+                                </el-button>
+                            </el-tooltip>
+                            <el-tooltip v-if="data.level <= 1" class="item" effect="dark" content="添加" placement="top">
+                                <el-button type="text" icon="el-icon-plus" @click="() => append(node, data)">
                                 </el-button>
                             </el-tooltip>
                             <el-tooltip class="item" effect="dark" content="删除" placement="top">
-                                <el-button type="text" size="mini" icon="el-icon-minus"
-                                    @click="() => remove(node, data)">
+                                <el-button type="text" icon="el-icon-minus" @click="() => remove(node, data)">
                                 </el-button>
                             </el-tooltip>
                         </span>
@@ -158,7 +164,7 @@
                             newChild = {
                                 label: parts[1],
                                 children: [],
-                                isLeaf: false,
+                                level: 0,
                                 info: null
                             };
                             this.data.push(newChild); // 插入导师根节点
@@ -168,7 +174,7 @@
                                 newChild = {
                                     label: parts[0],
                                     children: [],
-                                    isLeaf: false,
+                                    level: 1,
                                     info: null
                                 };
                                 this.data[this.treeCount].children.push(newChild); // 添加学生类型结点
@@ -178,7 +184,7 @@
                                     newLeaf = {
                                         label: people[person],
                                         children: [],
-                                        isLeaf: true,
+                                        level: 2,
                                         info: null
                                     };
                                     this.data[this.treeCount].children[type].children.push(newLeaf); // 添加学生叶节点
@@ -216,40 +222,33 @@
                 this.inputData = '';
             },
 
-            retrieveInfo(leaf) {
-                if (leaf.info) {
-                    this.$alert(leaf.label + "：" + leaf.info);
-                }
+            retrieveInfo(data) {
+                this.$alert(data.label + "：" + data.info);
             },
 
             append(node, data) {
-                if (!data.isLeaf) {
-                    this.$prompt('请输入添加内容', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                    }).then(({ value }) => {
-                        if (!node.parent.label) {
-                            newChild = {
-                                label: value,
-                                children: [],
-                                isLeaf: false,
-                                info: null
-                            };
-                        }
-                        else {
-                            newChild = {
-                                label: value,
-                                children: [],
-                                isLeaf: true,
-                                info: null
-                            };
-                        }
-                        data.children.push(newChild);
-                    });
-                }
-                else {
-                    this.$alert('不允许向学生添加子节点。', '错误');
-                }
+                this.$prompt('请输入添加内容', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(({ value }) => {
+                    if (node.level == 1) {
+                        newChild = {
+                            label: value,
+                            children: [],
+                            level: 2,
+                            info: null
+                        };
+                    }
+                    else {
+                        newChild = {
+                            label: value,
+                            children: [],
+                            level: 1,
+                            info: null
+                        };
+                    }
+                    data.children.push(newChild);
+                });
             },
 
             remove(node, data) {
