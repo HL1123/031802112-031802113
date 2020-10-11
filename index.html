@@ -80,14 +80,14 @@
                                     icon="el-icon-user">
                                 </el-button>
                             </span>
-                            <span v-if="!data.level" style="font-weight: 700">{{ node.label }}</span>
+                            <span v-if="data.level == 0 || data.level == 3" style="font-weight: 700">{{ node.label }}</span>
                             <span v-else>{{ node.label }}</span>
                             <span>
                                 <el-tooltip class="item" effect="dark" content="修改" placement="top">
                                     <el-button type="text" icon="el-icon-edit-outline" @click="() => modify(data)">
                                     </el-button>
                                 </el-tooltip>
-                                <el-tooltip v-if="data.level <= 1" class="item" effect="dark" content="添加"
+                                <el-tooltip v-if="data.level != 2" class="item" effect="dark" content="添加"
                                     placement="top">
                                     <el-button type="text" icon="el-icon-plus" @click="() => append(node, data)">
                                     </el-button>

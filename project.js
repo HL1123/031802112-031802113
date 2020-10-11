@@ -17,24 +17,30 @@ var Main = {
             this.treeCount = -1;
             id = 0;
             type = 0;
+            root = null;
             if (this.inputData) {
                 lines = this.inputData.split("\n"); // 拆分输入行
-                flag = false;
+                flag = 0;
                 // console.log(lines);
                 for (line in lines) {
                     parts = lines[line].split("："); // 0 为数据类型，1 为数据内容
                     // console.log(parts);
                     if (parts[0] === "导师") { // 建立新树
-                        flag = true;
+                        flag = 1;
                         type = 0; // 重置学生类型
-                        newChild = {
+                        if (root) {
+                            for (tree = 0; tree <= this.treeCount; tree++) {
+                                this.associate(this.data[tree], root);
+                            }
+                        }
+                        root = {
                             id: id++,
                             label: parts[1],
                             children: [],
                             level: 0,
                             info: null
                         };
-                        this.data.push(newChild); // 插入导师根节点
+                        this.data.push(root); // 插入导师根节点
                         this.treeCount++;
                     } else if (this.treeCount >= 0) {
                         if (parts[0].search(/博士生|硕士生|本科生/) != -1) { // 该行为学生
@@ -73,7 +79,7 @@ var Main = {
                         } else if (parts[0] != "" && parts[0] != "\r") {
                             temp = parseInt(line) + 1;
                             this.$alert("请检查输入格式是否正确并尝试重新输入。第 " + temp + " 行可能有错。", '输入错误');
-                            flag = true;
+                            flag = -1;
                             break;
                         }
                     }
@@ -81,10 +87,19 @@ var Main = {
                         break;
                     }
                 }
-                if (!flag) {
+                if (flag == 0) {
                     this.$alert("请检查输入格式是否正确并尝试重新输入。", '输入错误');
                 }
+                else if (flag == 1) {
+                    this.$message("树建立成功！");
+                }
             }
+            if (root) {
+                for (tree = 0; tree <= this.treeCount; tree++) {
+                    this.associate(this.data[tree], root);
+                }
+            }
+            // console.log(this.data);
         },
 
         clearData() {
@@ -113,6 +128,7 @@ var Main = {
             children = parent.data.children || parent.data;
             index = children.findIndex(d => d.id === data.id);
             children.splice(index, 1);
+            this.$message('删除成功！');
         },
 
         modify(data) {
@@ -133,6 +149,7 @@ var Main = {
             if (this.actionType) {
                 this.temp.label = this.form.name;
                 this.temp.info = this.form.info;
+                this.$message('修改成功！');
             } else {
                 newChild = {
                     id: id++,
@@ -142,6 +159,7 @@ var Main = {
                     info: this.form.info
                 };
                 this.temp.children.push(newChild);
+                this.$message('添加成功！');
             }
         },
 
@@ -149,6 +167,7 @@ var Main = {
             this.dialog2Visible = false;
             if (this.actionType) {
                 this.temp.label = this.form.name;
+                this.$message('修改成功！');
             } else {
                 newChild = {
                     id: id++,
@@ -158,6 +177,7 @@ var Main = {
                     info: null
                 };
                 this.temp.children.push(newChild);
+                this.$message('添加成功！');
             }
         },
 
@@ -171,6 +191,28 @@ var Main = {
                 this.inputData = rd.reading({ encode: 'UTF-8' || 'GBK' });
             };
             rd.readAsBinaryString(f);
+        },
+
+        associate(node, root) {
+            console.log(node);
+            if ((node.level == 2) && node.label == root.label) {
+                node.id = root.id;
+                node.level = 3;
+                node.children = root.children;
+                if (root.info) {
+                    node.info = root.info;
+                }
+                index = this.data.findIndex(d => d.id === root.id);
+                this.data.splice(index, 1);
+                this.treeCount--;
+                return 1;
+            }
+            for (child in node.children) {
+                if (this.associate(node.children[child], root) == 1)
+                {
+                    return 1;
+                }
+            }
         }
     },
 
