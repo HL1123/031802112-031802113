@@ -70,7 +70,7 @@ var Main = {
                                     }
                                 }
                             }
-                        } else if (parts[0] != "") {
+                        } else if (parts[0] != "" && parts[0] != "\r") {
                             temp = parseInt(line) + 1;
                             this.$alert("请检查输入格式是否正确并尝试重新输入。第 " + temp + " 行可能有错。", '输入错误');
                             flag = true;
@@ -168,7 +168,7 @@ var Main = {
         read(f) {
             let rd = new FileReader();
             rd.onload = e => {  //this.readAsArrayBuffer函数内，会回调this.onload函数。在这里处理结果
-                this.inputData = rd.reading({ encode: 'UTF-8' || 'GBK'});
+                this.inputData = rd.reading({ encode: 'UTF-8' || 'GBK' });
             };
             rd.readAsBinaryString(f);
         }
