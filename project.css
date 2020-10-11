@@ -26,6 +26,7 @@ body {
     left: 2%;
     position: fixed;
     height: 5%;
+    line-height: 5%;
     width: 30%;
     top: 85%;
     text-align: center;
@@ -36,6 +37,7 @@ body {
     left: 2%;
     position: fixed;
     height: 5%;
+    line-height: 5%;
     width: 30%;
     bottom: 3%;
 }
@@ -46,6 +48,7 @@ body {
     top: 10%;
     position: fixed;
     height: 5%;
+    line-height: 5%;
     width: 65%;
 }
 

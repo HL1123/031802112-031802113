@@ -65,7 +65,7 @@
                     <el-button @click="clearData">清空</el-button>
                 </el-row>
                 <el-col :span="16">
-                    <el-input placeholder="输入关键字搜索" id="search" v-model="filterText" clearable>
+                    <el-input placeholder="输入关键字搜索" id="search" v-model="filterText">
                     </el-input>
                     <el-tree class="filter-tree" id="tree" :data="data" :props="defaultProps" node-key="id"
                         default-expand-all :filter-node-method="filterNode" draggable :expand-on-click-node="false"
