@@ -12,7 +12,8 @@
 <body>
     <h1 style="text-align: center;">学术家族树</h1>
     <div id="app">
-        <el-dialog title="请输入信息" :visible.sync="dialog1Visible" :modal-append-to-body='false'>
+        <el-dialog title="请输入信息" :visible.sync="dialog1Visible" :modal-append-to-body='false'
+            :close-on-click-modal='false'>
             <el-form :model="form">
                 <el-form-item label="姓名">
                     <el-input v-model="form.name"></el-input>
@@ -26,7 +27,8 @@
                 <el-button type="primary" @click="handleClose1()">确定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="请输入信息" :visible.sync="dialog2Visible" :modal-append-to-body='false'>
+        <el-dialog title="请输入信息" :visible.sync="dialog2Visible" :modal-append-to-body='false'
+            :close-on-click-modal='false'>
             <el-form :model="form">
                 <el-form-item label="学生类型">
                     <el-input v-model="form.name"></el-input>
@@ -51,47 +53,54 @@
 李二：字节跳动、京东云" v-model="inputData" autofocus resize="none">
                 </el-input>
                 <br><br>
+                <div style="text-align: center;">
+                    <el-upload accept=".txt" :file-list="fileList" :auto-upload="false" :on-change="elInFile" action=""
+                        :show-file-list="false">
+                        <el-button id="upload" @click="clearData" type="info" plain>选择文件 (UTF-8 编码)
+                        </el-button>
+                    </el-upload>
+                </div>
                 <el-row id="button" type="flex" justify="center">
                     <el-button type="primary" @click="processInput">生成家族树</el-button>
                     <el-button @click="clearData">清空</el-button>
                 </el-row>
-                <div class="grid-content"></div>
-            </el-col>
-            <el-col :span="16">
-                <el-input placeholder="输入关键字搜索" id="search" v-model="filterText" clearable>
-                </el-input>
-                <el-tree class="filter-tree" id="tree" :data="data" :props="defaultProps" node-key="id"
-                    default-expand-all :filter-node-method="filterNode" draggable :expand-on-click-node="false" hidden
-                    ref="tree">
-                    <span class="custom-tree-node" slot-scope="{ node, data }">
-                        <span>
-                            <el-tooltip v-if="data.info" class="item" effect="dark" content="查看资料" placement="top">
-                                <el-button type="text" icon="el-icon-user" @click="() => retrieveInfo(data)">
+                <el-col :span="16">
+                    <el-input placeholder="输入关键字搜索" id="search" v-model="filterText" clearable>
+                    </el-input>
+                    <el-tree class="filter-tree" id="tree" :data="data" :props="defaultProps" node-key="id"
+                        default-expand-all :filter-node-method="filterNode" draggable :expand-on-click-node="false"
+                        hidden ref="tree">
+                        <span class="custom-tree-node" slot-scope="{ node, data }">
+                            <span>
+                                <el-tooltip v-if="data.info" class="item" effect="dark" content="查看资料" placement="top">
+                                    <el-button type="text" icon="el-icon-user" @click="() => retrieveInfo(data)">
+                                    </el-button>
+                                </el-tooltip>
+                                <el-button v-else-if="data.level != 1" type="text" style="color: gray;"
+                                    icon="el-icon-user">
                                 </el-button>
-                            </el-tooltip>
-                            <el-button v-else-if="data.level != 1" type="text" style="color: gray;" icon="el-icon-user">
-                            </el-button>
+                            </span>
+                            <span v-if="!data.level" style="font-weight: 700">{{ node.label }}</span>
+                            <span v-else>{{ node.label }}</span>
+                            <span>
+                                <el-tooltip class="item" effect="dark" content="修改" placement="top">
+                                    <el-button type="text" icon="el-icon-edit-outline" @click="() => modify(data)">
+                                    </el-button>
+                                </el-tooltip>
+                                <el-tooltip v-if="data.level <= 1" class="item" effect="dark" content="添加"
+                                    placement="top">
+                                    <el-button type="text" icon="el-icon-plus" @click="() => append(node, data)">
+                                    </el-button>
+                                </el-tooltip>
+                                <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                    <el-button type="text" icon="el-icon-minus" @click="() => remove(node, data)">
+                                    </el-button>
+                                </el-tooltip>
+                            </span>
                         </span>
-                        <span v-if="!data.level" style="font-weight: 700">{{ node.label }}</span>
-                        <span v-else>{{ node.label }}</span>
-                        <span>
-                            <el-tooltip class="item" effect="dark" content="修改" placement="top">
-                                <el-button type="text" icon="el-icon-edit-outline" @click="() => modify(data)">
-                                </el-button>
-                            </el-tooltip>
-                            <el-tooltip v-if="data.level <= 1" class="item" effect="dark" content="添加" placement="top">
-                                <el-button type="text" icon="el-icon-plus" @click="() => append(node, data)">
-                                </el-button>
-                            </el-tooltip>
-                            <el-tooltip class="item" effect="dark" content="删除" placement="top">
-                                <el-button type="text" icon="el-icon-minus" @click="() => remove(node, data)">
-                                </el-button>
-                            </el-tooltip>
-                        </span>
-                    </span>
-                </el-tree>
-                <div class="grid-content"></div>
-            </el-col>
+                    </el-tree>
+                    <div class="grid-content"></div>
+                </el-col>
         </el-row>
     </div>
 </body>

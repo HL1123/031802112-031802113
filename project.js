@@ -159,6 +159,18 @@ var Main = {
                 };
                 this.temp.children.push(newChild);
             }
+        },
+
+        elInFile(f, fs) {
+            this.read(f.raw);
+        },
+
+        read(f) {
+            let rd = new FileReader();
+            rd.onload = e => {  //this.readAsArrayBuffer函数内，会回调this.onload函数。在这里处理结果
+                this.inputData = rd.reading({ encode: 'UTF-8' || 'GBK'});
+            };
+            rd.readAsBinaryString(f);
         }
     },
 
@@ -172,6 +184,7 @@ var Main = {
             dialog2Visible: false,
             actionType: 0,
             temp: null,
+            fileList: [],
             form: {
                 name: '',
                 info: ''
@@ -182,6 +195,19 @@ var Main = {
             }
         };
     },
+
+    beforeCreate() {
+        /* 读取文件（自定义函数） */
+        FileReader.prototype.reading = function ({ encode } = pms) {
+            let bytes = new Uint8Array(this.result);    //无符号整型数组
+            let text = new TextDecoder(encode).decode(bytes);
+            return text;
+        };
+        /* 重写readAsBinaryString函数 */
+        FileReader.prototype.readAsBinaryString = function (f) {
+            this.readAsArrayBuffer(f);  //内部会回调this.onload方法
+        };
+    }
 };
 var Ctor = Vue.extend(Main)
 new Ctor().$mount('#app')

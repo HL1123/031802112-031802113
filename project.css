@@ -17,8 +17,18 @@ body {
     color: black;
     font-family: sans-serif;
     position: fixed;
-    height: 80%;
+    height: 75%;
     width: 30%;
+}
+
+/* 按钮 */
+#upload {
+    left: 2%;
+    position: fixed;
+    height: 5%;
+    width: 30%;
+    top: 85%;
+    text-align: center;
 }
 
 /* 按钮 */
