@@ -10,7 +10,6 @@
 </head>
 
 <body>
-    <h1 style="text-align: center;">学术家族树</h1>
     <div id="app">
         <el-dialog title="请输入信息" :visible.sync="dialog1Visible" :modal-append-to-body='false'
             :close-on-click-modal='false'>
@@ -65,8 +64,28 @@
                     <el-button @click="clearData">清空</el-button>
                 </el-row>
                 <el-col :span="16">
-                    <el-input placeholder="输入关键字搜索" id="search" v-model="filterText">
+                    <el-input placeholder="输入姓名搜索" id="search" v-model="filterText">
                     </el-input>
+                    <div id="hint">
+                        <h1>欢迎使用学术家族树系统！</h1>
+                        <h2>使用说明</h2>
+                        <ul>
+                            <li>请在左侧输入框内按格式输入师生信息，或者选择文本文件，并点击生成家族树按钮。</li>
+                            <li>上方的搜索框可以用于搜索师生姓名。</li>
+                            <li>点击结点左侧的三角号可以展开或收缩子结点。</li>
+                            <li>如果有填写导师或学生的个人资料（技能、工作经历等），可以点击结点左侧的蓝色头像图标查看。</li>
+                            <li>如果需要对数据做简单的编辑、添加、删除，可以使用结点右侧的按钮。</li>
+
+                        </ul>
+                        <h2>注意事项</h2>
+                        <ul>
+                            <li>请严格按照输入框提示的规范输入数据。多余的空格、半角标点等都会被视为输入错误。</li>
+                            <li>如果使用文本文件作为输入，只能使用 UTF-8 编码且后缀名为 txt 的文件。</li>
+                            <li>同一导师名下且同年级的学生请写在同一行里。不同行的数据不会自动整合。</li>
+                            <li>每次生成家族树前会先将已有数据清空，如需添加树请直接加在输入框已有数据后面。</li>
+                            <li>人员的技能和工作经历信息需要写在当前树的人员信息结束之后，下一颗树开始之前。</li>
+                            <li>如需关联两棵树，需要将包含“祖先”导师的树放在前面。暂不支持通过右侧结点的添加按钮生成关联树。</li>
+                    </div>
                     <el-tree class="filter-tree" id="tree" :data="data" :props="defaultProps" node-key="id"
                         default-expand-all :filter-node-method="filterNode" draggable :expand-on-click-node="false"
                         hidden ref="tree">
@@ -80,7 +99,8 @@
                                     icon="el-icon-user">
                                 </el-button>
                             </span>
-                            <span v-if="data.level == 0 || data.level == 3" style="font-weight: 700">{{ node.label }}</span>
+                            <span v-if="data.level == 0 || data.level == 3"
+                                style="font-weight: 700">{{ node.label }}</span>
                             <span v-else>{{ node.label }}</span>
                             <span>
                                 <el-tooltip class="item" effect="dark" content="修改" placement="top">

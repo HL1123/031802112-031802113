@@ -13,11 +13,11 @@ body {
 /* 数据输入框 */
 #input {
     left: 2%;
-    top: 10%;
+    top: 3%;
     color: black;
     font-family: sans-serif;
     position: fixed;
-    height: 75%;
+    height: 83%;
     width: 30%;
 }
 
@@ -36,8 +36,8 @@ body {
 #button {
     left: 2%;
     position: fixed;
-    height: 5%;
-    line-height: 5%;
+    height: 6%;
+    line-height: 6%;
     width: 30%;
     bottom: 3%;
 }
@@ -45,21 +45,36 @@ body {
 /* 搜索框 */
 #search {
     right: 2%;
-    top: 10%;
+    top: 3%;
     position: fixed;
     height: 5%;
     line-height: 5%;
     width: 65%;
 }
 
+#hint {
+    right: 2%;
+    top: 11%;
+    margin-bottom: 3%;
+    padding: 1%;
+    background-color: white;
+    border-radius: 3px;
+    position: fixed;
+    height: 82%;
+    width: 63%;
+    overflow: auto;
+    line-height: 175%;
+}
+
 /* 树 */
 #tree {
     right: 2%;
-    top: 18%;
-    margin-bottom: 2%;
+    top: 11%;
+    margin-bottom: 3%;
+    padding: 1%;
     position: fixed;
-    height: 80%;
-    width: 65%;
+    height: 82%;
+    width: 63%;
     overflow: auto;
 }
 
